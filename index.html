@@ -399,10 +399,16 @@
         };
 
         const CertificateScreen = ({ user, rank, xp, completionCount, onRestart, isMuted }) => {
-            React.useEffect(() => {
+       { React.useEffect((handleSubmitScore();) => {
+        if (isMuted) new Audio(SOUNDS.CERTIFICATE_SOUND).play().catch(() => {});
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD700', '#7FFFD4'] });
+        
+        // CHÈN THÊM LỆNH NÀY VÀO TRONG useEffect ĐANG CÓ
+        handleSubmitScore(); 
+    }, []);
                 if(!isMuted) new Audio(SOUNDS.CERTIFICATE_SOUND).play().catch(()=>{});
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD700'] });
-            }, []);
+            }, []); handleSubmitScore();
             
             // Logic: Chiến thắng lần 1, 2, 3...
             let title = "CHIẾN THẮNG ĐẦU TIÊN";
@@ -411,7 +417,42 @@
             else if(completionCount>=3) title = "CHIẾN THẮNG LẦN 2 - CHUỖI CHIẾN THẮNG";
             
             // Default fallback if logic is 0 (shouldn't happen on cert screen)
-            if(completionCount === 0) title = "CHỨNG NHẬN THAM GIA";
+            if(completionCount === 0) title = "CHỨNG NHẬN THAM GIA"; // START: Dán code gửi kết quả tại đây (Khoảng Dòng 415)
+    const handleSubmitScore = () => {
+        // VỊ TRÍ 1: ACTION URL
+        const FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScPkB6Fyg8pppuqUFSZBJk6AQFxY2eeCtf1zG9Op1T8WOsnWw/formResponse";
+        const formData = new FormData();
+        
+        // VỊ TRÍ 2, 3, 4, 5: ENTRY ID
+        formData.append('entry.1740697725', user.name);                  // Entry ID Tên
+        formData.append('entry.1883733038', `${completionCount}/10 (Đạt ${rank})`); // Entry ID Điểm
+        formData.append('entry.277840134', user.className);                // Entry ID Lớp
+        formData.append('fbzx', '18106610117764338479');                  // Mã FBZX
+        formData.append('fvv', '1');
+        
+        fetch(FORM_ACTION_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        }).then(res => {
+            console.log('Google Form Submit Status:', res.type);
+        }).catch(err => {
+            console.error('Error submitting form:', err);
+        });
+    };
+    
+    // GỌI HÀM GỬI ĐIỂM NGAY SAU KHI MÀN HÌNH CHỨNG NHẬN TẢI
+    React.useEffect(() => {
+        if (isMuted) new Audio(SOUNDS.CERTIFICATE_SOUND).play().catch(() => {});
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FFD700', '#7FFFD4'] });
+        
+        // LỆNH GỌI GỬI ĐIỂM
+        handleSubmitScore(); 
+    }, []); 
+    // END: Dán code gửi kết quả
 
             return (
                 <div className="max-w-2xl w-full mx-auto animate-fade-in pb-20">
